@@ -16,7 +16,7 @@
       "description": "Password of the database user."
     },
     {
-      "name": "jdbc.connection.driverClassName",
+      "name": "jdbc.connection.driver-class-name",
       "type": "java.lang.String",
       "description": "Name of the JDBC driver class."
     }
