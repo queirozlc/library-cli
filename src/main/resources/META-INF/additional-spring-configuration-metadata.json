@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "jdbc.connection.url",
+      "type": "java.lang.String",
+      "description": "URL for the JDBC connection."
+    },
+    {
+      "name": "jdbc.connection.username",
+      "type": "java.lang.String",
+      "description": "Username for the database connection."
+    },
+    {
+      "name": "jdbc.connection.password",
+      "type": "java.lang.String",
+      "description": "Password of the database user."
+    },
+    {
+      "name": "jdbc.connection.driverClassName",
+      "type": "java.lang.String",
+      "description": "Name of the JDBC driver class."
+    }
+  ]
+}
