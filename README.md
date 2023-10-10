@@ -52,6 +52,7 @@ Go to the project directory `src/main/resources` and set up your environment var
   DATABASE_URL=jdbc:oracle:thin:@//localhost:11521/YOUR_DB
   DATABASE_USERNAME=library-root
   DATABASE_PASSWORD=root
+  DATABASE_DRIVER=oracle.jdbc.driver.OracleDriver
 ```
 
 Ensure that you have a JDK installed, the project runs the JAVA 17. Besides, the oracle database must be ready to go.
