@@ -4,4 +4,6 @@ import java.sql.PreparedStatement;
 
 public interface DomainValuesExtractor {
     void extract(PreparedStatement statement);
+
+    void assignId(Long id);
 }
