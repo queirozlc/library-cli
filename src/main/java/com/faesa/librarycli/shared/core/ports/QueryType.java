@@ -1,6 +1,6 @@
 package com.faesa.librarycli.shared.core.ports;
 
-public enum QueryTypes {
+public enum QueryType {
     INSERT,
     SELECT,
     UPDATE,
