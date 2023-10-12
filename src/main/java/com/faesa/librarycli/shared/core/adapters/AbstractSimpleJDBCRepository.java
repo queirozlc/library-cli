@@ -7,6 +7,7 @@ import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -76,6 +77,20 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
 
     @Override
     public Optional<T> findById(ID id) {
+        Class<T> domainClass = getDomainClass();
+        String query = getQuery(QueryType.SELECT_BY_ID, domainClass);
+        try (var statement = connection.prepareStatement(query)) {
+            statement.setObject(1, id);
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                domainClass.getDeclaredConstructor().setAccessible(true);
+                T entity = domainClass.getDeclaredConstructor().newInstance();
+                entity.fromResultSet(resultSet);
+                return Optional.of(entity);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return Optional.empty();
     }
 
@@ -107,11 +122,9 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
                 .build(domainClass);
     }
 
-    private String getQueryWithArgs(QueryType type, Class<?> domainClass, Object... args) {
-        return queryBuilders.stream()
-                .filter(queryBuilder -> queryBuilder.supports(type))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No query builder found for type " + type))
-                .build(domainClass, args);
+    private Class<T> getDomainClass() {
+        ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
+        Class<?> domainClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+        return (Class<T>) domainClass;
     }
 }
