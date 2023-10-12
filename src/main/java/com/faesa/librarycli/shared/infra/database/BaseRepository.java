@@ -3,7 +3,7 @@ package com.faesa.librarycli.shared.infra.database;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface Repository<T, ID> {
+public interface BaseRepository<T, ID> {
 
     T save(T entity);
 
