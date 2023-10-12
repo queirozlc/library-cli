@@ -29,17 +29,7 @@ public class InsertQueryBuilder implements QueryBuilder {
         return type.equals(QueryType.INSERT);
     }
 
-    @Override
-    public String build(Object... args) {
-        var builder = new StringBuilder("INSERT INTO ");
-        builder.append(args[0]);
-        builder.append(" (");
-        List<Field> fields = new ArrayList<>(Arrays.stream(args[1].getClass().getDeclaredFields()).toList());
-
-        // remove the id field because will be auto generated
-        return resolveQueryFields(builder, fields);
-    }
-
+    
     private String resolveQueryFields(StringBuilder builder, List<Field> fields) {
         fields.removeIf(field -> field.getName().equalsIgnoreCase("id"));
 

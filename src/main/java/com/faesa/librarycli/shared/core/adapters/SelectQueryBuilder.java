@@ -5,15 +5,14 @@ import com.faesa.librarycli.shared.core.ports.QueryType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SelectByIdQueryBuilder implements QueryBuilder {
+public class SelectQueryBuilder implements QueryBuilder {
     @Override
     public String build(Class<?> domainClass) {
-        return "SELECT * FROM " + domainClass.getSimpleName().toLowerCase() +
-                " WHERE id = ?";
+        return "SELECT * FROM " + domainClass.getSimpleName().toLowerCase();
     }
 
     @Override
     public boolean supports(QueryType type) {
-        return type.equals(QueryType.SELECT_BY_ID);
+        return type.equals(QueryType.SELECT);
     }
 }
