@@ -1,11 +1,8 @@
 package com.faesa.librarycli.shared.infra.database;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Collection;
 import java.util.Optional;
 
-@Component
 public interface Repository<T, ID> {
 
     T save(T entity);
