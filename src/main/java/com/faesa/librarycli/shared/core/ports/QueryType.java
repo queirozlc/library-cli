@@ -6,5 +6,4 @@ public enum QueryType {
     UPDATE,
     DELETE,
     SELECT_BY_ID,
-    DELETE_BY_ID,
 }

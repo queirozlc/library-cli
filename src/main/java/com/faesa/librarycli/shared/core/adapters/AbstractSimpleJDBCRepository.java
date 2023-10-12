@@ -7,13 +7,12 @@ import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @param <T>  Entity type
@@ -94,24 +93,42 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
         return Optional.empty();
     }
 
-    @Override
-    public void delete(T entity) {
-
-    }
 
     @Override
     public void deleteById(ID id) {
-
+        var query = getQuery(QueryType.DELETE, getDomainClass());
+        try (var statement = connection.prepareStatement(query)) {
+            statement.setObject(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Collection<T> findAll() {
-        return null;
+        var entities = new ArrayList<>(Collections.<T>emptyList());
+        var query = getQuery(QueryType.SELECT, getDomainClass());
+        try (var statement = connection.prepareStatement(query)) {
+            var resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                getDomainClass().getDeclaredConstructor().setAccessible(true);
+                var entity = getDomainClass().getDeclaredConstructor().newInstance();
+                entity.fromResultSet(resultSet);
+                entities.add(entity);
+            }
+
+        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        return entities;
     }
 
     @Override
     public boolean existsById(ID id) {
-        return false;
+        return findById(id).isPresent();
     }
 
     private String getQuery(QueryType type, Class<?> domainClass) {
