@@ -4,6 +4,7 @@ import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import org.springframework.util.Assert;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Author implements DomainValuesExtractor {
@@ -34,5 +35,16 @@ public class Author implements DomainValuesExtractor {
     public void assignId(Long id) {
         Assert.state(this.id == null, "Id already assigned");
         this.id = id;
+    }
+
+    @Override
+    public void fromResultSet(ResultSet resultSet) {
+        try {
+            this.id = resultSet.getLong("id");
+            this.name = resultSet.getString("name");
+            this.nationality = resultSet.getString("nationality");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
