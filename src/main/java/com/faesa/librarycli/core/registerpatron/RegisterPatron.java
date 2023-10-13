@@ -27,7 +27,8 @@ public class RegisterPatron {
             @ShellOption(value = {
                     "-t", "--type"
             }, help = "Patron type, must be one of: STUDENT, RESEARCHER, REGULAR",
-                    valueProvider = PatronTypeValueProvider.class
+                    valueProvider = PatronTypeValueProvider.class,
+                    defaultValue = "REGULAR"
             ) @NotBlank String type
     ) {
         var patronType = PatronType.supports(type);
