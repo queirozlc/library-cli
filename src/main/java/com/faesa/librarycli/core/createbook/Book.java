@@ -25,7 +25,7 @@ public class Book implements DomainValuesExtractor<Long> {
 
     private Author author;
 
-    
+
     public Book(String title, String isbn, LocalDate publicationDate, Integer pages, Author author) {
         this.title = title;
         this.isbn = isbn;
@@ -48,9 +48,9 @@ public class Book implements DomainValuesExtractor<Long> {
     }
 
     @Override
-    public void assignId(Object id) {
+    public void assignId(Long id) {
         Assert.state(this.id == null, "Id already assigned");
-        this.id = Long.parseLong(String.valueOf(id));
+        this.id = id;
     }
 
     @Override
