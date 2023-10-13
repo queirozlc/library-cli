@@ -1,14 +1,16 @@
 package com.faesa.librarycli.core.createauthor;
 
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
+import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Author implements DomainValuesExtractor {
+public class Author implements DomainValuesExtractor<Long> {
 
+    @Getter
     private Long id;
     private String name;
     private String nationality;
@@ -47,4 +49,5 @@ public class Author implements DomainValuesExtractor {
             throw new RuntimeException(e);
         }
     }
+
 }

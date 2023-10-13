@@ -42,13 +42,18 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Component
-public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtractor, ID> implements BaseRepository<T, ID> {
+public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtractor<ID>, ID> implements BaseRepository<T, ID> {
 
     private final Connection connection;
     private final Set<QueryBuilder> queryBuilders;
 
     @Override
     public T save(T entity) {
+        // if the entity has an id, it means that it already exists in the database, then will be updated
+        if (entity.getId() != null) {
+            return update(entity);
+        }
+
         var query = getQuery(QueryType.INSERT, entity.getClass());
         // creates a statement object with the option to generate auto generated keys
         // this will allow us to get the id of the inserted entity
@@ -64,7 +69,7 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
 
             // if there is a generated key, set it to the entity
             if (generatedKeys.next()) {
-                entity.assignId(generatedKeys.getLong(1));
+                entity.assignId((ID) generatedKeys.getObject(1));
                 return entity;
             }
         } catch (SQLException e) {
@@ -72,6 +77,18 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
         }
 
         return null;
+    }
+
+    private T update(T entity) {
+        var query = getQuery(QueryType.UPDATE, entity.getClass());
+        try (var statement = connection.prepareStatement(query)) {
+            entity.extract(statement);
+            statement.setObject(entity.getClass().getDeclaredFields().length + 1, entity.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return entity;
     }
 
     @Override
