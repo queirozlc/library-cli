@@ -17,6 +17,7 @@ public class Book implements DomainValuesExtractor<Long> {
     private Long id;
     private String title;
 
+    @Getter
     private String isbn;
 
     private LocalDate publicationDate;
@@ -65,4 +66,5 @@ public class Book implements DomainValuesExtractor<Long> {
             throw new RuntimeException(e);
         }
     }
+
 }

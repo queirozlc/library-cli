@@ -18,11 +18,18 @@ public class Instance implements DomainValuesExtractor<Long> {
 
     private Book book;
 
+    public Instance(InstanceStatus status, InstanceType type, Book book) {
+        this.status = status;
+        this.type = type;
+        this.book = book;
+    }
+
     @Override
     public void setStatementValues(PreparedStatement statement) {
         try {
             statement.setString(1, status.name());
             statement.setString(2, type.name());
+            statement.setString(3, book.getIsbn());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

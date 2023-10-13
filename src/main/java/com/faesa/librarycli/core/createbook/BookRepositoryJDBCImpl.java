@@ -94,15 +94,38 @@ public class BookRepositoryJDBCImpl implements BookRepository {
     }
 
     private Book buildBook(ResultSet resultSet) throws SQLException {
+
         var author = authorRepository
                 .findById(resultSet.getLong("author_id"))
                 .orElseThrow(() -> new RuntimeException("Author not found"));
+
         var title = resultSet.getString("title");
+
         var isbn = resultSet.getString("isbn");
+
         var publicationDate = resultSet.getDate("publication_date").toLocalDate();
+
         var pages = resultSet.getInt("pages");
+
         return new Book(title, isbn, publicationDate, pages, author);
     }
 
 
+    @Override
+    public Optional<Book> findByIsbn(String bookIsbn) {
+        String sql = "SELECT * FROM book WHERE isbn = ?";
+        try (var statement = connection.prepareStatement(sql)) {
+            statement.setString(1, bookIsbn);
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                var book = buildBook(resultSet);
+                book.assignId(resultSet.getLong("id"));
+                return Optional.of(book);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return Optional.empty();
+    }
 }
