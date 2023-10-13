@@ -3,6 +3,7 @@ package com.faesa.librarycli.core.createauthor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,6 +35,21 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(Long id) {
+        String sql = "SELECT * FROM author WHERE id = ?";
+        try (var statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                Constructor<Author> authorConstructor = Author.class.getDeclaredConstructor();
+                authorConstructor.setAccessible(true);
+                var author = authorConstructor.newInstance();
+                author.fromResultSet(resultSet);
+                return Optional.of(author);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return Optional.empty();
     }
 
