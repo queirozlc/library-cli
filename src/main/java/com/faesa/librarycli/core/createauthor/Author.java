@@ -36,9 +36,9 @@ public class Author implements DomainValuesExtractor<Long> {
     }
 
     @Override
-    public void assignId(Long id) {
+    public void assignId(Object id) {
         Assert.state(this.id == null, "Id already assigned");
-        this.id = id;
+        this.id = Long.parseLong(String.valueOf(id));
     }
 
     @Override

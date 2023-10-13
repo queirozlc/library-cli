@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 public interface DomainValuesExtractor<ID> {
     void extract(PreparedStatement statement);
 
-    void assignId(ID id);
+    void assignId(Object id);
 
     void fromResultSet(ResultSet resultSet);
 
