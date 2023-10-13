@@ -44,7 +44,7 @@ import java.util.*;
 @Component
 public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtractor<ID>, ID> implements BaseRepository<T, ID> {
 
-    private final Connection connection;
+    protected final Connection connection;
     private final Set<QueryBuilder> queryBuilders;
 
     @Override
@@ -69,6 +69,7 @@ public abstract class AbstractSimpleJDBCRepository<T extends DomainValuesExtract
 
             // if there is a generated key, set it to the entity
             if (generatedKeys.next()) {
+                // cannot convert integer object from result set to long, has to be another way
                 entity.assignId((ID) generatedKeys.getObject(1));
                 return entity;
             }

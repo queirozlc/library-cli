@@ -36,12 +36,13 @@ public class CreateBook {
             @ShellOption(
                     help = "The ISBN of the book",
                     value = {"-i", "--isbn"}
-            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_10) @UniqueValue(domainClass = Book.class, fieldName = "isbn") String isbn,
+            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_10) @UniqueValue(domainClass = Book.class, fieldName = "isbn", message = "Already exists a book with this ISBN") String isbn,
             @ShellOption(
                     help = "The publication date of the book",
                     value = {"-d", "--publication-date"}
             ) @NotBlank
-            @Pattern(regexp = "^(0[1-9]|1[0-2])/(0[1-9]|1[0-9]|2[0-9]|3[0-1])/(19|20)\\d{2}$")
+            // regex pattern to validate date in format dd/MM/yyyy
+            @Pattern(regexp = "^([0-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/\\d{4}$", message = "Date must be in format dd/MM/yyyy")
             String publicationDate,
             @ShellOption(
                     help = "The number of pages of the book",

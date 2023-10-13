@@ -1,5 +1,6 @@
 package com.faesa.librarycli.core.createauthor;
 
+import com.faesa.librarycli.shared.core.domain.EntityClass;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -8,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@EntityClass(tableName = "author")
 public class Author implements DomainValuesExtractor<Long> {
 
     @Getter

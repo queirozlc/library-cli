@@ -1,6 +1,7 @@
 package com.faesa.librarycli.core.createbook;
 
 import com.faesa.librarycli.core.createauthor.Author;
+import com.faesa.librarycli.shared.core.domain.EntityClass;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+@EntityClass(tableName = "book")
 public class Book implements DomainValuesExtractor<Long> {
 
     @Getter
@@ -21,6 +23,9 @@ public class Book implements DomainValuesExtractor<Long> {
     private LocalDate publicationDate;
 
     private Integer pages;
+
+    @EntityClass.Column(name = "author_id")
+    @EntityClass.hasOne(foreignKey = "id")
     private Author author;
 
     /**
