@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public interface DomainValuesExtractor<ID> {
-    void extract(PreparedStatement statement);
+    void setStatementValues(PreparedStatement statement);
 
     void assignId(Object id);
 
