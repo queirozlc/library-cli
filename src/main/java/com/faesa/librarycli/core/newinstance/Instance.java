@@ -1,22 +1,22 @@
 package com.faesa.librarycli.core.newinstance;
 
 import com.faesa.librarycli.core.createbook.Book;
+import com.faesa.librarycli.core.placinghold.Hold;
+import com.faesa.librarycli.core.registerpatron.Patron;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import org.springframework.util.Assert;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.UnaryOperator;
 
 public class Instance implements DomainValuesExtractor<Long> {
 
+    private final Book book;
     private Long id;
-
     private InstanceStatus status;
-
     private InstanceType type;
-
-    private Book book;
 
     public Instance(InstanceStatus status, InstanceType type, Book book) {
         this.status = status;
@@ -54,6 +54,23 @@ public class Instance implements DomainValuesExtractor<Long> {
 
     @Override
     public Long getId() {
-        return null;
+        Assert.state(id != null, "Id not assigned");
+        return id;
+    }
+
+    @Override
+    public boolean hasId() {
+        return id != null;
+    }
+
+    public boolean acceptsHold(Patron patron) {
+        return status == InstanceStatus.AVAILABLE && type.acceptsHold(patron);
+    }
+
+    public Hold placeOnHold(Patron patron, UnaryOperator<Instance> onHold) {
+        Assert.state(acceptsHold(patron), "Instance does not accept hold");
+        this.status = InstanceStatus.HOLD;
+        onHold.apply(this);
+        return new Hold(patron, this);
     }
 }
