@@ -4,6 +4,7 @@ import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,5 +46,21 @@ public class Patron implements DomainValuesExtractor<Long> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean canBorrowRestrictedInstances() {
+        return type == PatronType.RESEARCHER || type == PatronType.STUDENT;
+    }
+
+    public boolean hasId() {
+        return id != null;
+    }
+
+    public Integer getHoldDuration() {
+        return type.availableHoldDuration();
+    }
+
+    public BigDecimal feeForPlacingHold() {
+        return type.currentHoldFee();
     }
 }
