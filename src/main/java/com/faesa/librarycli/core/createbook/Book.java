@@ -1,7 +1,10 @@
 package com.faesa.librarycli.core.createbook;
 
 import com.faesa.librarycli.core.createauthor.Author;
-import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
+import com.faesa.librarycli.core.newinstance.Instance;
+import com.faesa.librarycli.core.placinghold.Hold;
+import com.faesa.librarycli.core.registerpatron.Patron;
+import com.faesa.librarycli.shared.infra.database.RelationshipDomainExtractor;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
@@ -9,22 +12,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
 
-public class Book implements DomainValuesExtractor<Long> {
+public class Book implements RelationshipDomainExtractor<Long> {
 
+    private final Author author;
+    private final List<Instance> copies = new ArrayList<>();
     @Getter
     private Long id;
     private String title;
-
     @Getter
     private String isbn;
-
     private LocalDate publicationDate;
-
     private Integer pages;
-
-    private Author author;
 
 
     public Book(String title, String isbn, LocalDate publicationDate, Integer pages, Author author) {
@@ -67,4 +70,28 @@ public class Book implements DomainValuesExtractor<Long> {
         }
     }
 
+    @Override
+    public boolean hasId() {
+        return id != null;
+    }
+
+    public boolean canBePlacedOnHold(Patron patron) {
+        return copies.stream().anyMatch(copy -> copy.acceptsHold(patron));
+    }
+
+    public Hold placeOnHold(Patron patron, UnaryOperator<Instance> onHold) {
+        return copies.stream()
+                .filter(copy -> copy.acceptsHold(patron))
+                .findFirst()
+                .map(copy -> copy.placeOnHold(patron, onHold))
+                .orElseThrow(() -> new RuntimeException("No copy available"));
+    }
+
+    @Override
+    public void fromResultSetWithRelationships(ResultSet resultSet) {
+    }
+
+    public void addInstance(Instance instance) {
+        copies.add(instance);
+    }
 }

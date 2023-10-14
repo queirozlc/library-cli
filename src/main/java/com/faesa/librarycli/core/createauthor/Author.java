@@ -51,4 +51,8 @@ public class Author implements DomainValuesExtractor<Long> {
         }
     }
 
+    @Override
+    public boolean hasId() {
+        return id != null;
+    }
 }

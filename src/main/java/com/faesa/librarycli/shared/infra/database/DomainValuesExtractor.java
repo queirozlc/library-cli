@@ -11,4 +11,8 @@ public interface DomainValuesExtractor<ID> {
     void fromResultSet(ResultSet resultSet);
 
     ID getId();
+
+    boolean hasId();
 }
+
+
