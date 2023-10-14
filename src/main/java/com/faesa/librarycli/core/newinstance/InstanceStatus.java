@@ -2,6 +2,6 @@ package com.faesa.librarycli.core.newinstance;
 
 public enum InstanceStatus {
     AVAILABLE,
-    BORROWED,
+    CHECKED_OUT,
     HOLD;
 }
