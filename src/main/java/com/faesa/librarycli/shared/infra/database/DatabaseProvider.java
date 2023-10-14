@@ -37,13 +37,4 @@ public final class DatabaseProvider {
 
         return connection;
     }
-
-    public static void closeConnection() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
 }
