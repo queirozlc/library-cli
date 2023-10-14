@@ -17,6 +17,9 @@ public class InstanceRepositoryJDBC implements InstanceRepository {
 
     @Override
     public Instance save(Instance entity) {
+        if (entity.hasId()) {
+            return update(entity);
+        }
         String sql = "INSERT INTO instance (status, type, book_isbn) VALUES (?, ?, ?)";
 
         try (var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -52,5 +55,20 @@ public class InstanceRepositoryJDBC implements InstanceRepository {
     @Override
     public boolean existsById(Long aLong) {
         return false;
+    }
+
+    private Instance update(Instance entity) {
+        String sql = "UPDATE instance SET status = ?, type = ?, book_isbn = ? WHERE id = ?";
+
+        try (var statement = connection.prepareStatement(sql)) {
+            connection.setAutoCommit(false);
+            entity.setStatementValues(statement);
+            statement.setLong(4, entity.getId());
+            statement.executeUpdate();
+            connection.commit();
+            return entity;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
