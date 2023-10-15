@@ -22,6 +22,7 @@ public class Hold implements DomainValuesExtractor<Long> {
     private BigDecimal holdFee;
 
     public Hold(Patron patron, Instance instance) {
+        Assert.isTrue(instance.acceptsHold(patron), "Instance does not accept hold for this patron");
         this.patron = patron;
         this.instance = instance;
         this.datePlaced = LocalDate.now();
