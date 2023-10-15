@@ -12,10 +12,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class Hold implements DomainValuesExtractor<Long> {
+    private final Patron patron;
+    private final Instance instance;
     private Long id;
-    private Patron patron;
-    private Instance instance;
-
     private LocalDate datePlaced;
 
     private Integer daysToExpire;
