@@ -23,6 +23,7 @@ public class Book implements RelationshipDomainExtractor<Long> {
     private final List<Instance> copies = new ArrayList<>();
     @Getter
     private Long id;
+    @Getter
     private String title;
     @Getter
     private String isbn;
@@ -93,5 +94,10 @@ public class Book implements RelationshipDomainExtractor<Long> {
 
     public void addInstance(Instance instance) {
         copies.add(instance);
+    }
+
+
+    public String getAuthorName() {
+        return author.getName();
     }
 }

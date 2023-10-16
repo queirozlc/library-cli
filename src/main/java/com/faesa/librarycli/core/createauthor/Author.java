@@ -12,6 +12,7 @@ public class Author implements DomainValuesExtractor<Long> {
 
     @Getter
     private Long id;
+    @Getter
     private String name;
     private String nationality;
 

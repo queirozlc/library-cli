@@ -73,4 +73,12 @@ public class Instance implements DomainValuesExtractor<Long> {
         onHold.apply(this);
         return new Hold(patron, this);
     }
+
+    public String bookTitle() {
+        return book.getTitle();
+    }
+
+    public String bookAuthorName() {
+        return book.getAuthorName();
+    }
 }

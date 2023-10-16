@@ -3,6 +3,7 @@ package com.faesa.librarycli.core.placinghold;
 import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.registerpatron.Patron;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
+import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
@@ -15,6 +16,8 @@ public class Hold implements DomainValuesExtractor<Long> {
     private final Patron patron;
     private final Instance instance;
     private Long id;
+
+    @Getter
     private LocalDate datePlaced;
 
     private Integer daysToExpire;
@@ -28,6 +31,14 @@ public class Hold implements DomainValuesExtractor<Long> {
         this.datePlaced = LocalDate.now();
         this.daysToExpire = patron.getHoldDuration();
         this.holdFee = patron.feeForPlacingHold();
+    }
+
+    public Hold(Patron patron, Instance instance, LocalDate datePlaced, Integer daysToExpire, BigDecimal holdFee) {
+        this.patron = patron;
+        this.instance = instance;
+        this.datePlaced = datePlaced;
+        this.daysToExpire = daysToExpire;
+        this.holdFee = holdFee;
     }
 
     @Override
@@ -76,5 +87,25 @@ public class Hold implements DomainValuesExtractor<Long> {
         Assert.state(this.datePlaced != null, "Hold not placed yet");
         Assert.state(LocalDate.now().isBefore(this.datePlaced.plusDays(daysToExpire)), "Hold cannot expire in the past");
         this.daysToExpire = daysToExpire;
+    }
+
+    public Long getInstanceId() {
+        return this.instance.getId();
+    }
+
+    public String getBookTitle() {
+        return this.instance.bookTitle();
+    }
+
+    public Integer getExpirationDays() {
+        return this.daysToExpire;
+    }
+
+    public Double getFee() {
+        return this.holdFee.doubleValue();
+    }
+
+    public String bookAuthorName() {
+        return this.instance.bookAuthorName();
     }
 }
