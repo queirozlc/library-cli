@@ -6,16 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
 import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
-import org.springframework.shell.standard.ValueProvider;
+import org.springframework.shell.standard.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 @ShellComponent
+@ShellCommandGroup("Book Commands")
 @RequiredArgsConstructor
 public class NewInstance {
 

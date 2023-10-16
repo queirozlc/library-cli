@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
 import org.springframework.shell.context.InteractionMode;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
-import org.springframework.shell.standard.ValueProvider;
+import org.springframework.shell.standard.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -16,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @ShellComponent
+@ShellCommandGroup("Patron Commands")
 @RequiredArgsConstructor
 public class RegisterPatron {
 

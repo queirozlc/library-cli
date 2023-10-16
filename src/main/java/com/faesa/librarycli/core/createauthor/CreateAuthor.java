@@ -2,11 +2,13 @@ package com.faesa.librarycli.core.createauthor;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
+@ShellCommandGroup("Book Commands")
 @RequiredArgsConstructor
 public class CreateAuthor {
 

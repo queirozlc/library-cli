@@ -9,11 +9,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
+import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
+@ShellCommandGroup("Patron Commands")
 @RequiredArgsConstructor
 public class PlaceBookOnHold {
 

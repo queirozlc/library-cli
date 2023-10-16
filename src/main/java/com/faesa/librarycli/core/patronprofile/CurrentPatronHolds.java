@@ -4,6 +4,7 @@ import com.faesa.librarycli.core.placinghold.HoldRepository;
 import com.faesa.librarycli.core.registerpatron.PatronRepository;
 import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -15,6 +16,7 @@ import org.springframework.shell.table.TableModel;
 import java.util.stream.Stream;
 
 @ShellComponent
+@ShellCommandGroup("Patron Profile Commands")
 @RequiredArgsConstructor
 public class CurrentPatronHolds {
     private static final String[] TABLE_HEADERS = {"Hold Id", "Instance Id", "Book Title", "Author Name", "Date Placed", "Days to Expire", "Hold Fee"};
