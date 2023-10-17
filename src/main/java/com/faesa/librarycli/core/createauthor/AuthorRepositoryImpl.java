@@ -19,14 +19,16 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public Author save(Author entity) {
-        var sql = "INSERT INTO author (name, nationality) VALUES (?, ?)";
-        try (var statement = connection.prepareStatement(sql)) {
+        var sql = "INSERT INTO C##LABDATABASE.author (name, nationality) VALUES (?, ?)";
+        try (var statement = connection.prepareStatement(sql, new String[]{"id"})) {
+            connection.setAutoCommit(false);
             entity.setStatementValues(statement);
             statement.executeUpdate();
             var generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 entity.assignId(generatedKeys.getLong(1));
             }
+            connection.commit();
             return entity;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -35,7 +37,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(Long id) {
-        String sql = "SELECT * FROM author WHERE id = ?";
+        String sql = "SELECT * FROM C##LABDATABASE.author WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -55,7 +57,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public void deleteById(Long id) {
-        var sql = "DELETE FROM author WHERE id = ?";
+        var sql = "DELETE FROM C##LABDATABASE.author WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
@@ -67,7 +69,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
     @Override
     public Collection<Author> findAll() {
         var authors = new ArrayList<Author>();
-        var sql = "SELECT * FROM author";
+        var sql = "SELECT * FROM C##LABDATABASE.author";
         try (var statement = connection.prepareStatement(sql)) {
             var resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -83,6 +85,13 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public boolean existsById(Long id) {
-        return findById(id).isPresent();
+        String sql = "SELECT COUNT(*) FROM C##LABDATABASE.author WHERE id = ?";
+        try (var statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            var resultSet = statement.executeQuery();
+            return resultSet.next() && resultSet.getInt(1) > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
