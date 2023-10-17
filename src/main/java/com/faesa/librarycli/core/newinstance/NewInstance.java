@@ -24,7 +24,7 @@ public class NewInstance {
     public String handle(
             @ShellOption(help = "The book's isbn", value = {"-i", "--isbn"})
             @NotBlank
-            @ISBN(type = ISBN.Type.ISBN_10) String bookIsbn,
+            @ISBN(type = ISBN.Type.ISBN_13) String bookIsbn,
             @ShellOption(
                     help = "The instance's type, it must be either FREE or RESTRICTED",
                     valueProvider = InstanceTypeValueProvider.class,

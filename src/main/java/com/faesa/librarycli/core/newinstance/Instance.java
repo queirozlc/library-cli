@@ -9,7 +9,6 @@ import org.springframework.util.Assert;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.UnaryOperator;
 
 public class Instance implements DomainValuesExtractor<Long> {
 
@@ -67,10 +66,10 @@ public class Instance implements DomainValuesExtractor<Long> {
         return status == InstanceStatus.AVAILABLE && type.acceptsHold(patron);
     }
 
-    public Hold placeOnHold(Patron patron, UnaryOperator<Instance> onHold) {
+    public Hold placeOnHold(Patron patron) {
         Assert.state(acceptsHold(patron), "Instance does not accept hold");
+        Assert.state(patron.canHold(), "Patron can't hold anymore because he has more than two holds overdue");
         this.status = InstanceStatus.HOLD;
-        onHold.apply(this);
         return new Hold(patron, this);
     }
 

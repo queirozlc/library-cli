@@ -77,14 +77,18 @@ public class Book implements RelationshipDomainExtractor<Long> {
     }
 
     public boolean canBePlacedOnHold(Patron patron) {
-        return copies.stream().anyMatch(copy -> copy.acceptsHold(patron));
+        return copies.stream().anyMatch(copy -> copy.acceptsHold(patron)) && patron.canHold();
     }
 
     public Hold placeOnHold(Patron patron, UnaryOperator<Instance> onHold) {
         return copies.stream()
                 .filter(copy -> copy.acceptsHold(patron))
                 .findFirst()
-                .map(copy -> copy.placeOnHold(patron, onHold))
+                .map(copy -> {
+                    Hold hold = copy.placeOnHold(patron);
+                    onHold.apply(copy);
+                    return hold;
+                })
                 .orElseThrow(() -> new RuntimeException("No copy available"));
     }
 

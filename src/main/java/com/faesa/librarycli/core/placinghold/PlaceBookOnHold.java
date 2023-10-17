@@ -33,7 +33,7 @@ public class PlaceBookOnHold {
             @ShellOption(
                     help = "The book's ISBN",
                     value = {"-i", "--isbn"}
-            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_10) String isbn,
+            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_13) String isbn,
             @ShellOption(
                     help = "The number of days the hold will last",
                     value = {"-d", "--days-to-expire"},

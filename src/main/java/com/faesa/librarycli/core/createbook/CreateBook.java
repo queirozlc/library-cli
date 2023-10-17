@@ -38,7 +38,7 @@ public class CreateBook {
             @ShellOption(
                     help = "The ISBN of the book",
                     value = {"-i", "--isbn"}
-            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_10) @UniqueValue(domainClass = Book.class, fieldName = "isbn", message = "Already exists a book with this ISBN") String isbn,
+            ) @NotBlank @ISBN(type = ISBN.Type.ISBN_13) @UniqueValue(domainClass = Book.class, fieldName = "isbn", message = "Already exists a book with this ISBN") String isbn,
             @ShellOption(
                     help = "The publication date of the book",
                     value = {"-d", "--publication-date"}
