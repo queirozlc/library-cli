@@ -1,5 +1,7 @@
 package com.faesa.librarycli.core.registerpatron;
 
+import com.faesa.librarycli.core.checkoutbook.LoanRepository;
+import com.faesa.librarycli.core.placinghold.HoldRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -7,7 +9,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 @Repository
@@ -15,6 +19,8 @@ import java.util.Optional;
 public class PatronRepositoryJDBC implements PatronRepository {
 
     private final Connection connection;
+    private final LoanRepository loanRepository;
+    private final HoldRepository holdRepository;
 
     @Override
     public Patron save(Patron entity) {
@@ -60,6 +66,8 @@ public class PatronRepositoryJDBC implements PatronRepository {
                     PatronType.valueOf(resultSet.getString("type"))
             );
             patron.assignId(resultSet.getLong("id"));
+            holdRepository.findAllPatronHolds(patron).forEach(patron::addHold);
+            loanRepository.findAllPatronCheckouts(patron).forEach(patron::addLoan);
             return patron;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -81,7 +89,17 @@ public class PatronRepositoryJDBC implements PatronRepository {
 
     @Override
     public Collection<Patron> findAll() {
-        return null;
+        String sql = "SELECT * FROM patron";
+        try (var statement = connection.prepareStatement(sql)) {
+            var resultSet = statement.executeQuery();
+            var patrons = new ArrayList<Patron>(Collections.emptyList());
+            while (resultSet.next()) {
+                patrons.add(buildPatron(resultSet));
+            }
+            return patrons;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

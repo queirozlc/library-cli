@@ -81,4 +81,8 @@ public class Instance implements DomainValuesExtractor<Long> {
     public String bookAuthorName() {
         return book.getAuthorName();
     }
+
+    public void checkout() {
+        this.status = InstanceStatus.CHECKED_OUT;
+    }
 }

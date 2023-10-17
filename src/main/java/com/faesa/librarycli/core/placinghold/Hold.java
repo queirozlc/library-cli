@@ -11,9 +11,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Hold implements DomainValuesExtractor<Long> {
     private final Patron patron;
+    @Getter
     private final Instance instance;
     private Long id;
 
@@ -25,7 +28,6 @@ public class Hold implements DomainValuesExtractor<Long> {
     private BigDecimal holdFee;
 
     public Hold(Patron patron, Instance instance) {
-        Assert.isTrue(instance.acceptsHold(patron), "Instance does not accept hold for this patron");
         this.patron = patron;
         this.instance = instance;
         this.datePlaced = LocalDate.now();
@@ -78,7 +80,7 @@ public class Hold implements DomainValuesExtractor<Long> {
 
     @Override
     public boolean hasId() {
-        return false;
+        return Objects.nonNull(id);
     }
 
     public void expireIn(Integer daysToExpire) {
@@ -108,4 +110,15 @@ public class Hold implements DomainValuesExtractor<Long> {
     public String bookAuthorName() {
         return this.instance.bookAuthorName();
     }
+
+    public boolean isExpired() {
+        int holdExpirationDays = Optional.ofNullable(this.daysToExpire).orElse(0);
+        return LocalDate.now().isAfter(this.datePlaced.plusDays(holdExpirationDays));
+    }
+
+    public void acceptCheckout() {
+        Assert.state(!isExpired(), "Hold is expired");
+        this.instance.checkout();
+    }
+
 }
