@@ -9,8 +9,10 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class Loan implements DomainValuesExtractor<Long> {
 
@@ -57,8 +59,8 @@ public class Loan implements DomainValuesExtractor<Long> {
         try {
             statement.setLong(1, hold.getId());
             statement.setInt(2, time);
-            statement.setTimestamp(3, java.sql.Timestamp.from(loanDate));
-            statement.setTimestamp(4, java.sql.Timestamp.from(dueDate));
+            statement.setTimestamp(3, Timestamp.from(loanDate));
+            statement.setTimestamp(4, Timestamp.from(dueDate));
             statement.setBigDecimal(5, overdueFee);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -78,12 +80,13 @@ public class Loan implements DomainValuesExtractor<Long> {
 
     @Override
     public Long getId() {
-        return null;
+        Assert.state(id != null, "Id not assigned");
+        return id;
     }
 
     @Override
     public boolean hasId() {
-        return false;
+        return Objects.nonNull(id);
     }
 
     public boolean wasReturned() {

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,8 +27,8 @@ public class PatronRepositoryJDBC implements PatronRepository {
             return update(entity);
         }
 
-        String sql = "INSERT INTO patron (name, type) VALUES (?, ?)";
-        try (var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO C##LABDATABASE.patron (name, type) VALUES (?, ?)";
+        try (var statement = connection.prepareStatement(sql, new String[]{"id"})) {
             connection.setAutoCommit(false);
             entity.setStatementValues(statement);
             statement.executeUpdate();
@@ -46,7 +45,7 @@ public class PatronRepositoryJDBC implements PatronRepository {
 
     @Override
     public Optional<Patron> findById(Long id) {
-        String sql = "SELECT * FROM patron WHERE id = ?";
+        String sql = "SELECT * FROM C##LABDATABASE.patron WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -76,7 +75,7 @@ public class PatronRepositoryJDBC implements PatronRepository {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM patron WHERE id = ?";
+        String sql = "DELETE FROM C##LABDATABASE.patron WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
             statement.setLong(1, id);
@@ -89,7 +88,7 @@ public class PatronRepositoryJDBC implements PatronRepository {
 
     @Override
     public Collection<Patron> findAll() {
-        String sql = "SELECT * FROM patron";
+        String sql = "SELECT * FROM C##LABDATABASE.patron";
         try (var statement = connection.prepareStatement(sql)) {
             var resultSet = statement.executeQuery();
             var patrons = new ArrayList<Patron>(Collections.emptyList());
@@ -104,7 +103,7 @@ public class PatronRepositoryJDBC implements PatronRepository {
 
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM patron WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM C##LABDATABASE.patron WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -119,7 +118,7 @@ public class PatronRepositoryJDBC implements PatronRepository {
     }
 
     private Patron update(Patron entity) {
-        String sql = "UPDATE patron SET name = ?, type = ? WHERE id = ?";
+        String sql = "UPDATE C##LABDATABASE.patron SET name = ?, type = ? WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
             entity.setStatementValues(statement);

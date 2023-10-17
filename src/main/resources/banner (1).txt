@@ -1,0 +1,40 @@
+####################################################################################
+# Esses são os comandos disponíveis no sistema da biblioteca:			   #
+#										   #
+# Comandos de Livros								   #
+#										   #
+#	create-book: Cria um novo livro na biblioteca.				   #
+#	new-instance: Registra uma nova instância de um livro na biblioteca.	   #
+#	create-author: Cria um novo autor.					   #
+#										   #
+# Comandos Integrados								   #
+#										   #
+#	help: Exibe ajuda sobre os comandos disponíveis.			   #
+#	stacktrace: Exibe a pilha de erros completa do último erro.		   #
+#	clear: Limpa a tela do console.						   #
+#	quit, exit: Sai do console.						   #
+#	history: Exibe ou salva o histórico de comandos executados anteriormente.  #
+#	version: Mostra informações sobre a versão.				   #
+#	script: Lê e executa comandos a partir de um arquivo.			   #
+#										   #
+# Comandos de Clientes								   #
+#										   #
+#	checkout-book: Empresta um livro para um cliente.			   #
+#	hold-book: Coloca um livro em espera para um cliente.		           #
+#	create-patron: Registra um novo cliente na biblioteca.			   #
+#										   #
+# Comandos de Perfil de cliente							   #
+#										   #
+#	patron-holds: Obtém todas as reservas atuais feitas por um cliente.	   #
+#										   #
+#										   #
+#	Criado por:								   #
+#		Rafael Klein						       	   #
+#	       	Giordan Garcia						 	   #
+#		Lucas Queiroz							   #
+#										   # 
+#	Disciplina: Banco de Dados - 2023/2					   #
+#	Professor: Howard Roatti						   #
+#										   #
+#										   #
+####################################################################################

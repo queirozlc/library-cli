@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 @Repository
@@ -26,9 +25,9 @@ public class LoanRepositoryJDBC implements LoanRepository {
     @Override
     public Loan save(Loan entity) {
         if (entity.hasId()) return update(entity);
-        String sql = "INSERT INTO loan (hold_id, time, loan_date, due_date, overdue_fee) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO C##LABDATABASE.loan (hold_id, time, loan_date, due_date, overdue_fee) VALUES (?, ?, ?, ?, ?)";
 
-        try (var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (var statement = connection.prepareStatement(sql, new String[]{"id"})) {
             connection.setAutoCommit(false);
             entity.setStatementValues(statement);
             statement.executeUpdate();
@@ -64,7 +63,7 @@ public class LoanRepositoryJDBC implements LoanRepository {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM loan WHERE id = ?";
+        String sql = "DELETE FROM C##LABDATABASE.loan WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
@@ -90,7 +89,7 @@ public class LoanRepositoryJDBC implements LoanRepository {
 
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM loan WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM C##LABDATABASE.loan WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -183,12 +182,12 @@ public class LoanRepositoryJDBC implements LoanRepository {
                 	a.name,
                 	a.nationality
                 FROM
-                	loan l
-                	INNER JOIN hold h ON l.hold_id = h.id
-                	INNER JOIN patron p ON p.id = h.patron_id
-                	INNER JOIN instance i ON i.id = h.instance_id
-                	INNER JOIN book b ON i.book_isbn = b.isbn
-                	INNER JOIN author a ON a.id = b.author_id
+                	C##LABDATABASE.loan l
+                	INNER JOIN C##LABDATABASE.hold h ON l.hold_id = h.id
+                	INNER JOIN C##LABDATABASE.patron p ON p.id = h.patron_id
+                	INNER JOIN C##LABDATABASE.instance i ON i.id = h.instance_id
+                	INNER JOIN C##LABDATABASE.book b ON i.book_isbn = b.isbn
+                	INNER JOIN C##LABDATABASE.author a ON a.id = b.author_id
                 WHERE
                 	%s
                 """.formatted(predicate);
@@ -216,17 +215,17 @@ public class LoanRepositoryJDBC implements LoanRepository {
                 	a.name,
                 	a.nationality
                 FROM
-                	loan l
-                	INNER JOIN hold h ON l.hold_id = h.id
-                	INNER JOIN patron p ON p.id = h.patron_id
-                	INNER JOIN instance i ON i.id = h.instance_id
-                	INNER JOIN book b ON i.book_isbn = b.isbn
-                	INNER JOIN author a ON a.id = b.author_id
+                	C##LABDATABASE.loan l
+                	INNER JOIN C##LABDATABASE.hold h ON l.hold_id = h.id
+                	INNER JOIN C##LABDATABASE.patron p ON p.id = h.patron_id
+                	INNER JOIN C##LABDATABASE.instance i ON i.id = h.instance_id
+                	INNER JOIN C##LABDATABASE.book b ON i.book_isbn = b.isbn
+                	INNER JOIN C##LABDATABASE.author a ON a.id = b.author_id
                 """;
     }
 
     private Loan update(Loan entity) {
-        String sql = "UPDATE loan SET hold_id = ?, time = ?, loan_date = ?, due_date = ?, overdue_fee = ? WHERE id = ?";
+        String sql = "UPDATE C##LABDATABASE.loan SET hold_id = ?, time = ?, loan_date = ?, due_date = ?, overdue_fee = ? WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
             var fields = entity.getClass().getDeclaredFields();

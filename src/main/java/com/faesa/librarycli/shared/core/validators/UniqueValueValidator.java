@@ -24,7 +24,7 @@ public class UniqueValueValidator implements ConstraintValidator<UniqueValue, Ob
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        var sql = String.format("SELECT 1 FROM %s WHERE %s = ?", domainClass.getSimpleName(), fieldName);
+        var sql = String.format("SELECT 1 FROM C##LABDATABASE.%s WHERE %s = ?", domainClass.getSimpleName(), fieldName);
         try (var statement = connection.prepareStatement(sql)) {
             statement.setObject(1, value);
             var resultSet = statement.executeQuery();

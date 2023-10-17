@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +23,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     @Override
     public Book save(Book entity) {
-        try (var statement = connection.prepareStatement("INSERT INTO book (title, isbn, publication_date, pages, author_id) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+        try (var statement = connection.prepareStatement("INSERT INTO C##LABDATABASE.book (title, isbn, publication_date, pages, author_id) VALUES (?, ?, ?, ?, ?)", new String[]{"id"})) {
             entity.setStatementValues(statement);
             statement.execute();
             var generatedKeys = statement.getGeneratedKeys();
@@ -54,7 +53,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM book WHERE id = ?";
+        String sql = "DELETE FROM C##LABDATABASE.book WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.execute();
@@ -81,7 +80,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM book WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM C##LABDATABASE.book WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -153,7 +152,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     private String getFindQueryWithPredicate(String predicate) {
         return "SELECT b.*, a.name, a.nationality " +
-                "FROM book b " +
+                "FROM C##LABDATABASE.book b " +
                 "INNER JOIN author a ON b.author_id = a.id " +
                 "WHERE " + predicate + " " +
                 "ORDER BY b.title";
@@ -162,14 +161,14 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     private String getFindAllQuery() {
         return "SELECT b.* " +
-                "FROM book b " +
+                "FROM C##LABDATABASE.book b " +
                 "INNER JOIN author a ON b.author_id = a.id " +
                 "ORDER BY b.title";
     }
 
     private String getInstancesQuery() {
         return "SELECT i.id as instance_id, i.type, i.status " +
-                "FROM instance i " +
+                "FROM C##LABDATABASE.instance i " +
                 "WHERE i.book_isbn = ?";
     }
 }

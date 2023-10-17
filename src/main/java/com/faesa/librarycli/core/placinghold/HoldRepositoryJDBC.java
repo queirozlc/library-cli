@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,8 +30,8 @@ public class HoldRepositoryJDBC implements HoldRepository {
         if (entity.hasId()) {
             return updateExistent(entity);
         }
-        String sql = "INSERT INTO hold (patron_id, instance_id, date_placed, days_to_expire, hold_fee) VALUES (?, ?, ?, ?, ?)";
-        try (var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO C##LABDATABASE.hold (patron_id, instance_id, date_placed, days_to_expire, hold_fee) VALUES (?, ?, ?, ?, ?)";
+        try (var statement = connection.prepareStatement(sql, new String[]{"id"})) {
             connection.setAutoCommit(false);
             entity.setStatementValues(statement);
             statement.executeUpdate();
@@ -59,7 +58,7 @@ public class HoldRepositoryJDBC implements HoldRepository {
 
     @Override
     public void deleteById(Long aLong) {
-        String sql = "DELETE FROM hold WHERE id = ?";
+        String sql = "DELETE FROM C##LABDATABASE.hold WHERE id = ?";
 
         try (var statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
@@ -83,7 +82,7 @@ public class HoldRepositoryJDBC implements HoldRepository {
 
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM hold WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM C##LABDATABASE.hold WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             var resultSet = statement.executeQuery();
@@ -94,7 +93,7 @@ public class HoldRepositoryJDBC implements HoldRepository {
     }
 
     private Hold updateExistent(Hold entity) {
-        String sql = "UPDATE hold SET patron_id = ?, instance_id = ?, date_placed = ?, days_to_expire = ?, hold_fee = ? WHERE id = ?";
+        String sql = "UPDATE C##LABDATABASE.hold SET patron_id = ?, instance_id = ?, date_placed = ?, days_to_expire = ?, hold_fee = ? WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false);
             entity.setStatementValues(statement);
@@ -112,26 +111,26 @@ public class HoldRepositoryJDBC implements HoldRepository {
         var holds = new ArrayList<>(Collections.<Hold>emptyList());
         var sql = """
                 SELECT
-                    h.id AS hold_id,
-                    h.date_placed,
-                    h.days_to_expire,
-                    h.hold_fee,
-                    i.type AS instance_type,
-                    i.status AS instance_status,
-                    i.id AS instance_id,
-                    b.isbn AS book_isbn,
-                    b.id AS book_id,
-                    b.pages,
-                    b.publication_date,
-                    b.title,
-                    a.name,
-                    a.nationality,
-                    a.id AS author_id
+                    H.id AS hold_id,
+                    H.date_placed,
+                    H.days_to_expire,
+                    H.hold_fee,
+                    I.type AS instance_type,
+                    I.status AS instance_status,
+                    I.id AS instance_id,
+                    B.isbn AS book_isbn,
+                    B.id AS book_id,
+                    B.pages,
+                    B.publication_date,
+                    B.title,
+                    A.name,
+                    A.nationality,
+                    A.id AS author_id
                 FROM
-                    hold h
-                INNER JOIN instance i ON i.id = h.instance_id
-                INNER JOIN book b ON b.isbn = i.book_isbn
-                INNER JOIN author a ON a.id = b.author_id
+                    C##LABDATABASE.HOLD H
+                INNER JOIN C##LABDATABASE.INSTANCE I ON I.id = H.instance_id
+                INNER JOIN C##LABDATABASE.BOOK B ON B.isbn = I.book_isbn
+                INNER JOIN C##LABDATABASE.AUTHOR A ON A.id = B.author_id
                 WHERE
                     h.patron_id = ?
                 """;

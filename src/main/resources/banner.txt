@@ -1,0 +1,40 @@
+###################################################################################
+# Esses são os comandos disponíveis no sistema da biblioteca:                     #
+#										                                          #
+# Comandos de Livros								                              #
+#										                                          #
+#	create-book: cria um novo livro na biblioteca.				                  #
+#	new-instance: registra uma nova instância de um livro na biblioteca.	      #
+#	create-author: cria um novo autor.					                          #
+#										                                          #
+# Comandos Integrados								                              #
+#										                                          #
+#	help: exibe ajuda sobre os comandos disponíveis.			                  #
+#	stacktrace: exibe a pilha de erros completa do último erro.		              #
+#	clear: limpa a tela do console.						                          #
+#	quit, exit: sai do console.						                              #
+#	history: exibe ou salva o histórico de comandos executados anteriormente.     #
+#	version: mostra informações sobre a versão.				                      #
+#	script: lê e executa comandos a partir de um arquivo.			              #
+#										                                          #
+# Comandos de Clientes								                              #
+#										                                          #
+#	checkout-book: empresta um livro para um cliente.			                  #
+#	hold-book: coloca um livro em espera para um cliente.		                  #
+#	create-patron: registra um novo cliente na biblioteca.			              #
+#										                                          #
+# Comandos de Perfil de cliente							                          #
+#										                                          #
+#	patron-holds: obtém todas as reservas atuais feitas por um cliente.	          #
+#										                                          #
+#										                                          #
+#	Criado por:								                                      #
+#		Rafael Klein						       	                              #
+#	    Giordan Garcia						 	                                  #
+#		Lucas Queiroz							                                  #
+#										                                          #
+#	Disciplina: Banco de Dados - 2023/2					                          #
+#	Professor: Howard Roatti						                              #
+#										                                          #
+#										                                          #
+###################################################################################
