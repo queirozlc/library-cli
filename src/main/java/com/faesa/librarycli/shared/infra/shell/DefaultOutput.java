@@ -1,4 +1,4 @@
-package com.faesa.librarycli.shared;
+package com.faesa.librarycli.shared.infra.shell;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DefaultOutput {
 
-    
+
     public String build() {
         return "Hello World";
     }
