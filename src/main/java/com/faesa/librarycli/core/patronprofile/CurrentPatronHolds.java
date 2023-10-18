@@ -8,12 +8,13 @@ import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import org.springframework.shell.table.ArrayTableModel;
+import org.springframework.shell.table.BeanListTableModel;
 import org.springframework.shell.table.BorderStyle;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
 
-import java.util.stream.Stream;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @ShellComponent
 @ShellCommandGroup("Patron Profile Commands")
@@ -34,31 +35,26 @@ public class CurrentPatronHolds {
             var holdResponse = holdRepository
                     .findAllPatronHolds(patron).stream()
                     .map(HoldResponse::from)
-                    .toArray(HoldResponse[]::new);
+                    .toList();
+            if (holdResponse.isEmpty()) {
+                helper.print("No holds found");
+                return;
+            }
             buildTableData(holdResponse);
         });
     }
 
-    private void buildTableData(HoldResponse[] holdResponse) {
-        String[] holdArray = Stream.of(holdResponse)
-                .map(hold -> new String[]{
-                        hold.holdId().toString(),
-                        hold.instanceId().toString(),
-                        hold.title(),
-                        hold.authorName(),
-                        hold.datePlaced(),
-                        hold.daysToExpire().toString(),
-                        hold.holdFee() * 100 + "%"
-                })
-                .flatMap(Stream::of)
-                .toArray(String[]::new);
+    private void buildTableData(List<HoldResponse> holdResponse) {
+        var headers = new LinkedHashMap<String, Object>();
+        headers.put("holdId", TABLE_HEADERS[0]);
+        headers.put("instanceId", TABLE_HEADERS[1]);
+        headers.put("title", TABLE_HEADERS[2]);
+        headers.put("authorName", TABLE_HEADERS[3]);
+        headers.put("datePlaced", TABLE_HEADERS[4]);
+        headers.put("daysToExpire", TABLE_HEADERS[5]);
+        headers.put("holdFee", TABLE_HEADERS[6]);
 
-        Object[][] tableData = new String[][]{
-                TABLE_HEADERS,
-                holdArray
-        };
-
-        TableModel model = new ArrayTableModel(tableData);
+        TableModel model = new BeanListTableModel<>(holdResponse, headers);
         TableBuilder tableBuilder = new TableBuilder(model);
         tableBuilder.addFullBorder(BorderStyle.fancy_light);
         helper.print(tableBuilder.build().render(100));
