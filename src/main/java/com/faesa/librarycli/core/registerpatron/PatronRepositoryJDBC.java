@@ -115,6 +115,20 @@ public class PatronRepositoryJDBC implements PatronRepository {
         return false;
     }
 
+    @Override
+    public int count() {
+        final var sql = "SELECT COUNT(*) FROM C##LABDATABASE.patron";
+        try (var statement = connection.prepareStatement(sql)) {
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
     private Patron update(Patron entity) {
         String sql = "UPDATE C##LABDATABASE.patron SET name = ?, type = ? WHERE id = ?";
         try (var statement = connection.prepareStatement(sql)) {

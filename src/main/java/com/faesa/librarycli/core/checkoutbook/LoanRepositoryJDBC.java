@@ -100,6 +100,20 @@ public class LoanRepositoryJDBC implements LoanRepository {
     }
 
     @Override
+    public int count() {
+        final var sql = "SELECT COUNT(*) FROM C##LABDATABASE.loan";
+        try (var statement = connection.prepareStatement(sql)) {
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    @Override
     public Collection<Loan> findAllPatronCheckouts(Patron patron) {
         var loans = new ArrayList<Loan>(Collections.emptyList());
         String sql = getFindByQuery("p.id = ?");

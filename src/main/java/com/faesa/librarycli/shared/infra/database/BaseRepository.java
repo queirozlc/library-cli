@@ -14,4 +14,6 @@ public interface BaseRepository<T extends DomainValuesExtractor<ID>, ID> {
     Collection<T> findAll();
 
     boolean existsById(ID id);
+
+    public int count();
 }

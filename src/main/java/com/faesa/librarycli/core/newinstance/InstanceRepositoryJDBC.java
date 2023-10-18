@@ -186,6 +186,21 @@ public class InstanceRepositoryJDBC implements InstanceRepository {
         }
     }
 
+    @Override
+    public int count() {
+        final var sql = "SELECT COUNT(*) FROM C##LABDATABASE.instance";
+        try (var statement = connection.prepareStatement(sql)) {
+            var resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+
     private Instance update(Instance entity) {
         String sql = "UPDATE C##LABDATABASE.instance SET status = ?, type = ?, book_isbn = ? WHERE id = ?";
 
