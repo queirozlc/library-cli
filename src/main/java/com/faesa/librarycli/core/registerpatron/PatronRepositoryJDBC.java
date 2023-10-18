@@ -1,6 +1,7 @@
 package com.faesa.librarycli.core.registerpatron;
 
 import com.faesa.librarycli.core.checkoutbook.LoanRepository;
+import com.faesa.librarycli.core.patronprofile.HeldAmountPerAuthor;
 import com.faesa.librarycli.core.placinghold.HoldRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -8,10 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -127,6 +125,38 @@ public class PatronRepositoryJDBC implements PatronRepository {
             connection.commit();
             return entity;
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<HeldAmountPerAuthor> findBooksHeldPerAuthor(Patron patron) {
+        final var sql = """
+                SELECT
+                    A.NAME,
+                    COUNT(*) AS NUMBER_OF_BOOKS_HELD
+                FROM C##LABDATABASE.HOLD H
+                INNER JOIN C##LABDATABASE.INSTANCE I ON H.INSTANCE_ID = I.ID
+                INNER JOIN C##LABDATABASE.BOOK B ON I.BOOK_ISBN = B.ISBN
+                INNER JOIN C##LABDATABASE.AUTHOR A ON B.AUTHOR_ID = A.ID
+                INNER JOIN C##LABDATABASE.PATRON P on P.ID = H.PATRON_ID
+                WHERE P.ID = ?
+                GROUP BY A.NAME
+                ORDER BY NUMBER_OF_BOOKS_HELD DESC
+                """;
+
+        try (var statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, patron.getId());
+            var resultSet = statement.executeQuery();
+            var result = new ArrayList<HeldAmountPerAuthor>();
+            while (resultSet.next()) {
+                result.add(new HeldAmountPerAuthor(
+                        resultSet.getString("name"),
+                        resultSet.getInt("number_of_books_held")
+                ));
+            }
+            return result;
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
