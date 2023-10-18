@@ -113,6 +113,8 @@ public class BookRepositoryJDBCImpl implements BookRepository {
 
     private Book fromResultSet(ResultSet resultSet) {
         try {
+            var bookPublicationDate = resultSet.getDate("publication_date").toLocalDate();
+
             var author = new Author(
                     resultSet.getString("name"),
                     resultSet.getString("nationality")
@@ -121,7 +123,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
             var book = new Book(
                     resultSet.getString("title"),
                     resultSet.getString("isbn"),
-                    resultSet.getDate("publication_date").toLocalDate(),
+                    bookPublicationDate,
                     resultSet.getInt("pages"),
                     author
             );
@@ -153,7 +155,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
     private String getFindQueryWithPredicate(String predicate) {
         return "SELECT b.*, a.name, a.nationality " +
                 "FROM C##LABDATABASE.book b " +
-                "INNER JOIN author a ON b.author_id = a.id " +
+                "INNER JOIN C##LABDATABASE.author a ON b.author_id = a.id " +
                 "WHERE " + predicate + " " +
                 "ORDER BY b.title";
 
@@ -162,7 +164,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
     private String getFindAllQuery() {
         return "SELECT b.* " +
                 "FROM C##LABDATABASE.book b " +
-                "INNER JOIN author a ON b.author_id = a.id " +
+                "INNER JOIN C##LABDATABASE.author a ON b.author_id = a.id " +
                 "ORDER BY b.title";
     }
 

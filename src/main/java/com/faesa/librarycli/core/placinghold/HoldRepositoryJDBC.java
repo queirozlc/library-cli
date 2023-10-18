@@ -9,11 +9,9 @@ import com.faesa.librarycli.core.registerpatron.Patron;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -154,26 +152,26 @@ public class HoldRepositoryJDBC implements HoldRepository {
             var bookIsbn = resultSet.getString("book_isbn");
             var bookId = resultSet.getLong("book_id");
             var pages = resultSet.getInt("pages");
-            String publicationDate = resultSet.getString("publication_date");
+            var publicationDate = resultSet.getDate("publication_date").toLocalDate();
             var title = resultSet.getString("title");
             var authorName = resultSet.getString("name");
             var nationality = resultSet.getString("nationality");
             var authorId = resultSet.getLong("author_id");
             var holdId = resultSet.getLong("hold_id");
-            var datePlaced = resultSet.getString("date_placed");
+            var datePlaced = resultSet.getDate("date_placed").toLocalDate();
             var daysToExpire = resultSet.getInt("days_to_expire");
-            var holdFee = resultSet.getDouble("hold_fee");
+            var holdFee = resultSet.getBigDecimal("hold_fee");
 
 
             var author = new Author(authorName, nationality);
             author.assignId(authorId);
 
-            var book = new Book(title, bookIsbn, LocalDate.parse(publicationDate), pages, author);
+            var book = new Book(title, bookIsbn, publicationDate, pages, author);
             book.assignId(bookId);
 
             var instance = new Instance(InstanceStatus.valueOf(instanceStatus), InstanceType.supports(instanceType), book);
             instance.assignId(resultSet.getLong("instance_id"));
-            var hold = new Hold(patron, instance, LocalDate.parse(datePlaced), daysToExpire, BigDecimal.valueOf(holdFee));
+            var hold = new Hold(patron, instance, datePlaced, daysToExpire, holdFee);
             hold.assignId(holdId);
             return hold;
         } catch (SQLException e) {

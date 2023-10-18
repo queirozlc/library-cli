@@ -84,4 +84,21 @@ public class Instance implements DomainValuesExtractor<Long> {
     public void checkout() {
         this.status = InstanceStatus.CHECKED_OUT;
     }
+
+    public boolean heldBy(Patron patron) {
+        return status == InstanceStatus.HOLD && patron.hasHoldOn(this);
+    }
+
+    public boolean isInstanceOf(Book book) {
+        return this.book.sameAs(book);
+    }
+
+    public void cancelHold() {
+        Assert.state(this.isHeld(), "Instance is not on hold");
+        this.status = InstanceStatus.AVAILABLE;
+    }
+
+    public boolean isHeld() {
+        return status == InstanceStatus.HOLD;
+    }
 }

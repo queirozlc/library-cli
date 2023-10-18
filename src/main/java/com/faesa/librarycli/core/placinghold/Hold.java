@@ -1,5 +1,6 @@
 package com.faesa.librarycli.core.placinghold;
 
+import com.faesa.librarycli.core.createbook.Book;
 import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.registerpatron.Patron;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
@@ -121,4 +122,16 @@ public class Hold implements DomainValuesExtractor<Long> {
         this.instance.checkout();
     }
 
+
+    public boolean heldInstanceMatches(Instance instance) {
+        return this.instance.getId().equals(instance.getId());
+    }
+
+    public boolean anyInstanceOf(Book book) {
+        return this.instance.isInstanceOf(book);
+    }
+
+    public void cancel() {
+        this.instance.cancelHold();
+    }
 }

@@ -1,6 +1,8 @@
 package com.faesa.librarycli.core.registerpatron;
 
 import com.faesa.librarycli.core.checkoutbook.Loan;
+import com.faesa.librarycli.core.createbook.Book;
+import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.placinghold.Hold;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
 import jakarta.validation.constraints.NotNull;
@@ -118,6 +120,33 @@ public class Patron implements DomainValuesExtractor<Long> {
                 .filter(hold -> hold.getId().equals(holdId))
                 .findFirst()
                 .map(hold -> checkout(hold, checkoutTime))
+                .orElseThrow(() -> new RuntimeException("Hold not found"));
+    }
+
+    public boolean hasHoldOn(Instance instance) {
+        return holds.stream().anyMatch(hold -> hold.heldInstanceMatches(instance));
+    }
+
+    public void cancelHold(Book book) {
+        holds.stream().filter(hold -> hold.anyInstanceOf(book))
+                .findFirst()
+                .ifPresent(hold -> {
+                    hold.cancel();
+                    holds.remove(hold);
+                });
+    }
+
+    public Long getHoldIdFor(Book book) {
+        return holds.stream().filter(hold -> hold.anyInstanceOf(book))
+                .findFirst()
+                .map(Hold::getId)
+                .orElseThrow(() -> new RuntimeException("Hold not found"));
+    }
+
+    public Instance getHoldInstanceFor(Book book) {
+        return holds.stream().filter(hold -> hold.anyInstanceOf(book))
+                .findFirst()
+                .map(Hold::getInstance)
                 .orElseThrow(() -> new RuntimeException("Hold not found"));
     }
 }

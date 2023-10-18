@@ -18,7 +18,6 @@ import java.util.function.UnaryOperator;
 
 
 public class Book implements RelationshipDomainExtractor<Long> {
-
     private final Author author;
     private final List<Instance> copies = new ArrayList<>();
     @Getter
@@ -103,5 +102,19 @@ public class Book implements RelationshipDomainExtractor<Long> {
 
     public String getAuthorName() {
         return author.getName();
+    }
+
+    public boolean hasHoldFrom(Patron patron) {
+        Assert.isTrue(this.hasAnyCopy(), "Book has no instances");
+        return this.copies.stream().anyMatch(copy -> copy.heldBy(patron));
+    }
+
+    public boolean hasAnyCopy() {
+        return !this.copies.isEmpty();
+    }
+
+
+    public boolean sameAs(Book book) {
+        return this.isbn.equals(book.isbn);
     }
 }
