@@ -5,7 +5,9 @@ import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.newinstance.InstanceRepository;
 import com.faesa.librarycli.core.placinghold.HoldRepository;
 import com.faesa.librarycli.core.registerpatron.PatronRepository;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
 import com.faesa.librarycli.shared.infra.shell.InputReader;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class CancelingHold {
     private final BookRepository bookRepository;
     private final InstanceRepository instanceRepository;
     private final InputReader inputReader;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
     @ShellMethod(value = "Cancel a book hold", key = "cancel-hold")
     public String perform(
@@ -52,10 +56,19 @@ public class CancelingHold {
                 patronRepository.save(patron);
                 instanceRepository.save(instanceHeld);
                 holdRepository.deleteById(holdToCancel);
-                return "Hold canceled";
+                shellHelper.printSuccess("\nHold canceled successfully\n");
+                return output.build();
             }
-            return "This patron doesn't have a hold for this book";
-        }).orElse("Book not found")).orElse("Patron not found");
+            shellHelper.printError("\nThis patron doesn't have a hold for this book\n");
+            return output.build();
+        }).orElseGet(() -> {
+            shellHelper.printError("\nBook not found\n");
+            return output.build();
+        })).orElseGet(() -> {
+            shellHelper.printError("\nPatron not found\n");
+            return output.build();
+        });
+                
     }
 
 }

@@ -5,6 +5,8 @@ import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.newinstance.InstanceRepository;
 import com.faesa.librarycli.core.placinghold.HoldRepository;
 import com.faesa.librarycli.core.registerpatron.PatronRepository;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ public class ReturnsLend {
     private final InstanceRepository instanceRepository;
     private final HoldRepository holdRepository;
     private final BookRepository bookRepository;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
     @ShellMethod(value = "Return a borrowed book", key = "return-book")
     public String perform(
@@ -47,9 +51,17 @@ public class ReturnsLend {
                 instance.instanceReturned();
                 instanceRepository.save(instance);
                 patronRepository.save(patron);
-                return "Book returned";
+                shellHelper.printSuccess("\nBook returned successfully\n");
+                return output.build();
             }
-            return "Book not borrowed by patron";
-        }).orElse("Book not found")).orElse("Patron not found");
+            shellHelper.printError("Book not borrowed by patron");
+            return output.build();
+        }).orElseGet(() -> {
+            shellHelper.printError("Book not found");
+            return output.build();
+        })).orElseGet(() -> {
+            shellHelper.printError("Patron not found");
+            return output.build();
+        });
     }
 }

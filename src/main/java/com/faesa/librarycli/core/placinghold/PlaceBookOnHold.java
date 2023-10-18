@@ -3,6 +3,8 @@ package com.faesa.librarycli.core.placinghold;
 import com.faesa.librarycli.core.createbook.BookRepository;
 import com.faesa.librarycli.core.newinstance.InstanceRepository;
 import com.faesa.librarycli.core.registerpatron.PatronRepository;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -24,6 +26,8 @@ public class PlaceBookOnHold {
     private final BookRepository bookRepository;
     private final InstanceRepository instanceRepository;
     private final HoldRepository holdRepository;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
     @ShellMethod(key = "place-hold", value = "Place a book on hold for a patron")
     public String perform(
@@ -44,14 +48,23 @@ public class PlaceBookOnHold {
         var patron = patronRepository.findById(patronId);
 
         return patron.map(patronFound -> bookRepository.findByIsbn(isbn).map(book -> {
-            int daysToExpireOrDefault = Optional.ofNullable(daysToExpire).orElse(patronFound.getHoldDuration());
-            if (book.canBePlacedOnHold(patronFound, daysToExpireOrDefault)) {
-                Hold hold = book.placeOnHold(patronFound, daysToExpireOrDefault, instanceRepository::save);
-                holdRepository.save(hold);
-                return "Hold placed successfully. Hold ID: " + hold.getId();
-            }
+                    int daysToExpireOrDefault = Optional.ofNullable(daysToExpire).orElse(patronFound.getHoldDuration());
+                    if (book.canBePlacedOnHold(patronFound, daysToExpireOrDefault)) {
+                        Hold hold = book.placeOnHold(patronFound, daysToExpireOrDefault, instanceRepository::save);
+                        holdRepository.save(hold);
+                        shellHelper.printSuccess("\nHold placed successfully\n");
+                        return output.build();
+                    }
 
-            return "Book does not support hold or patron has reached the maximum number of holds";
-        }).orElse("Book not found")).orElse("Patron not found");
+                    shellHelper.printError("Book does not support hold or patron has reached the maximum number of holds");
+                    return output.build();
+                })
+                .orElseGet(() -> {
+                    shellHelper.printError("\nBook not found\n");
+                    return output.build();
+                })).orElseGet(() -> {
+            shellHelper.printError("\nPatron not found\n");
+            return output.build();
+        });
     }
 }

@@ -2,6 +2,8 @@ package com.faesa.librarycli.core.checkoutbook;
 
 import com.faesa.librarycli.core.newinstance.InstanceRepository;
 import com.faesa.librarycli.core.registerpatron.PatronRepository;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ public class CheckoutBook {
     private final PatronRepository patronRepository;
     private final LoanRepository loanRepository;
     private final InstanceRepository instanceRepository;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
     //    @UniqueValue(domainClass = Loan.class, fieldName = "hold_id", message = "You cannot have two checkouts for the same hold")
     @ShellMethod(value = "Lends a book for some patron", key = "checkout-book")
@@ -39,7 +43,11 @@ public class CheckoutBook {
             Loan checkout = patron.createCheckout(holdId, maxCheckoutTime);
             loanRepository.save(checkout);
             instanceRepository.save(checkout.currentInstance());
-            return "Book successfully checked out";
-        }).orElse("Patron not found");
+            shellHelper.printSuccess("\nBook successfully checked out\n");
+            return output.build();
+        }).orElseGet(() -> {
+            shellHelper.printError("\nPatron not found\n");
+            return output.build();
+        });
     }
 }

@@ -1,6 +1,8 @@
 package com.faesa.librarycli.core.newinstance;
 
 import com.faesa.librarycli.core.createbook.BookRepository;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
@@ -19,6 +21,8 @@ public class NewInstance {
 
     private final InstanceRepository instanceRepository;
     private final BookRepository bookRepository;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
     @ShellMethod(key = "new-instance", value = "Register a new instance of a book on library")
     public String handle(
@@ -35,8 +39,12 @@ public class NewInstance {
         return bookRepository.findByIsbn(bookIsbn).map(book -> {
             var instance = new Instance(InstanceStatus.AVAILABLE, instanceType, book);
             instanceRepository.save(instance);
-            return "Instance created!";
-        }).orElse("Book not found!");
+            shellHelper.printSuccess("\nInstance created successfully\n");
+            return output.build();
+        }).orElseGet(() -> {
+            shellHelper.printError("\nBook not found\n");
+            return output.build();
+        });
     }
 }
 

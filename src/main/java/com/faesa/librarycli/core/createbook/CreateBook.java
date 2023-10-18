@@ -2,6 +2,8 @@ package com.faesa.librarycli.core.createbook;
 
 import com.faesa.librarycli.core.createauthor.AuthorRepository;
 import com.faesa.librarycli.shared.core.validators.UniqueValue;
+import com.faesa.librarycli.shared.infra.shell.DefaultOutput;
+import com.faesa.librarycli.shared.infra.shell.ShellHelper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -23,6 +25,8 @@ public class CreateBook {
 
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
+    private final ShellHelper shellHelper;
+    private final DefaultOutput output;
 
 
     @ShellMethod(value = "Creates a new book in the library", key = "create-book")
@@ -53,12 +57,14 @@ public class CreateBook {
     ) {
         var possibleAuthor = authorRepository.findById(authorId);
         if (possibleAuthor.isEmpty()) {
-            return "Author not found";
+            shellHelper.printError("\nAuthor not found\n");
+            return output.build();
         }
         var parsedPublicationDate = LocalDate.parse(publicationDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         var author = possibleAuthor.get();
         var book = new Book(title, isbn, parsedPublicationDate, pages, author);
         bookRepository.save(book);
-        return "Book created successfully";
+        shellHelper.printSuccess("\nBook created successfully\n");
+        return output.build();
     }
 }
