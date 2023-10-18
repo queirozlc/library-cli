@@ -1,5 +1,6 @@
 package com.faesa.librarycli.core.checkoutbook;
 
+import com.faesa.librarycli.core.createbook.Book;
 import com.faesa.librarycli.core.newinstance.Instance;
 import com.faesa.librarycli.core.placinghold.Hold;
 import com.faesa.librarycli.shared.infra.database.DomainValuesExtractor;
@@ -13,6 +14,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Set;
 
 public class Loan implements DomainValuesExtractor<Long> {
 
@@ -90,12 +92,44 @@ public class Loan implements DomainValuesExtractor<Long> {
     }
 
     public boolean wasReturned() {
-        // check if the due date has passed and the overdue fee is still zero
-        // if so, that means the book was returned on time
-        return Instant.now().isAfter(dueDate) && overdueFee.equals(BigDecimal.ZERO);
+        // The book is returned when the due date is before the current date
+        // and the overdue fee is zero.
+        // If the overdue fee is not zero, the
+        // book is overdue and the patron must pay the fee.
+        return dueDate.isBefore(Instant.now()) && overdueFee.compareTo(BigDecimal.ZERO) == 0;
     }
 
     public Instance currentInstance() {
         return hold.getInstance();
+    }
+
+    public boolean borrowedInstanceMatches(Instance instance) {
+        return this.currentInstance().isSameOf(instance);
+    }
+
+    public boolean isBorrowedInstanceOf(Book book) {
+        return this.currentInstance().isInstanceOf(book);
+    }
+
+    public void returnBook() {
+        Assert.state(!wasReturned(), "Book already returned");
+
+        if (isOverdue()) {
+            var exceededDays = Instant.now().until(dueDate, ChronoUnit.DAYS);
+            this.overdueFee = hold.patronsFeeForOverdueLoan().multiply(BigDecimal.valueOf(exceededDays));
+        } else {
+            this.overdueFee = BigDecimal.ZERO;
+        }
+
+        this.dueDate = Instant.now();
+        this.hold.instanceReturned();
+    }
+
+    public boolean heldMatches(Hold hold) {
+        return this.hold.getId().equals(hold.getId());
+    }
+
+    public boolean anyHeldMatches(Set<Hold> holds) {
+        return holds.stream().anyMatch(this::heldMatches);
     }
 }

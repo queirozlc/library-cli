@@ -6,13 +6,14 @@ import com.faesa.librarycli.core.registerpatron.PatronRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+
+import java.util.Optional;
 
 @ShellComponent
 @ShellCommandGroup("Patron Commands")
@@ -24,7 +25,7 @@ public class PlaceBookOnHold {
     private final InstanceRepository instanceRepository;
     private final HoldRepository holdRepository;
 
-    @ShellMethod(key = "hold-book", value = "Place a book on hold for a patron")
+    @ShellMethod(key = "place-hold", value = "Place a book on hold for a patron")
     public String perform(
             @ShellOption(
                     help = "The patron's ID",
@@ -37,22 +38,20 @@ public class PlaceBookOnHold {
             @ShellOption(
                     help = "The number of days the hold will last",
                     value = {"-d", "--days-to-expire"},
-                    defaultValue = "0"
-            ) @PositiveOrZero final Integer daysToExpire
+                    defaultValue = ShellOption.NULL
+            ) @Positive final Integer daysToExpire
     ) {
         var patron = patronRepository.findById(patronId);
 
         return patron.map(patronFound -> bookRepository.findByIsbn(isbn).map(book -> {
-            if (book.canBePlacedOnHold(patronFound)) {
-                Hold hold = book.placeOnHold(patronFound, instanceRepository::save);
-                if (daysToExpire > 0) {
-                    hold.expireIn(daysToExpire);
-                }
+            int daysToExpireOrDefault = Optional.ofNullable(daysToExpire).orElse(patronFound.getHoldDuration());
+            if (book.canBePlacedOnHold(patronFound, daysToExpireOrDefault)) {
+                Hold hold = book.placeOnHold(patronFound, daysToExpireOrDefault, instanceRepository::save);
                 holdRepository.save(hold);
                 return "Hold placed successfully. Hold ID: " + hold.getId();
             }
 
-            return "Book does not support hold";
+            return "Book does not support hold or patron has reached the maximum number of holds";
         }).orElse("Book not found")).orElse("Patron not found");
     }
 }

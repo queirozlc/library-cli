@@ -19,6 +19,17 @@ public enum PatronType {
         public boolean maximumLoansExceeded(int size) {
             return size >= 5;
         }
+
+        @Override
+        public BigDecimal feeForOverdueLoan() {
+            // students pay 10% of the book price for each day the book is overdue
+            return BigDecimal.valueOf(0.1);
+        }
+
+        @Override
+        public boolean maximumHoldsExceeded(int size) {
+            return false;
+        }
     },
     RESEARCHER {
         @Override
@@ -34,6 +45,17 @@ public enum PatronType {
 
         @Override
         public boolean maximumLoansExceeded(int size) {
+            return false;
+        }
+
+        @Override
+        public BigDecimal feeForOverdueLoan() {
+            // researchers pay 5% of the book price for each day the book is overdue
+            return BigDecimal.valueOf(0.05);
+        }
+
+        @Override
+        public boolean maximumHoldsExceeded(int size) {
             return false;
         }
     },
@@ -53,6 +75,17 @@ public enum PatronType {
         public boolean maximumLoansExceeded(int size) {
             return size >= 5;
         }
+
+        @Override
+        public BigDecimal feeForOverdueLoan() {
+            // regular patrons pay 10% of the book price for each day the book is overdue
+            return BigDecimal.valueOf(0.1);
+        }
+
+        @Override
+        public boolean maximumHoldsExceeded(int size) {
+            return size >= 5;
+        }
     };
 
     public static PatronType supports(String type) {
@@ -64,4 +97,10 @@ public enum PatronType {
     public abstract BigDecimal currentHoldFee();
 
     public abstract boolean maximumLoansExceeded(int size);
+
+
+    public abstract BigDecimal feeForOverdueLoan();
+
+    public abstract boolean maximumHoldsExceeded(int size);
+
 }

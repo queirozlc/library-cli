@@ -22,6 +22,7 @@ public class CheckoutBook {
     private final LoanRepository loanRepository;
     private final InstanceRepository instanceRepository;
 
+    //    @UniqueValue(domainClass = Loan.class, fieldName = "hold_id", message = "You cannot have two checkouts for the same hold")
     @ShellMethod(value = "Lends a book for some patron", key = "checkout-book")
     public String perform(
             @ShellOption(value = {"-p", "--patron"}, help = "Patron's id")
@@ -29,7 +30,6 @@ public class CheckoutBook {
 
             @ShellOption(value = {"-b", "--hold"}, help = "Hold's id")
             @NotNull @Positive Long holdId,
-
             @ShellOption(value = {"-t", "--time"},
                     help = "Borrowing time in days", defaultValue = ShellOption.NULL)
             @Range(min = 1, max = 60) Integer time

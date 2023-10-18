@@ -84,14 +84,6 @@ public class Hold implements DomainValuesExtractor<Long> {
         return Objects.nonNull(id);
     }
 
-    public void expireIn(Integer daysToExpire) {
-        Assert.state(this.daysToExpire == null, "Hold already expired");
-        Assert.state(daysToExpire > 0, "Days to expire must be greater than 0");
-        Assert.state(this.datePlaced != null, "Hold not placed yet");
-        Assert.state(LocalDate.now().isBefore(this.datePlaced.plusDays(daysToExpire)), "Hold cannot expire in the past");
-        this.daysToExpire = daysToExpire;
-    }
-
     public Long getInstanceId() {
         return this.instance.getId();
     }
@@ -133,5 +125,13 @@ public class Hold implements DomainValuesExtractor<Long> {
 
     public void cancel() {
         this.instance.cancelHold();
+    }
+
+    public BigDecimal patronsFeeForOverdueLoan() {
+        return this.patron.feeForOverdueLoan();
+    }
+
+    public void instanceReturned() {
+        this.instance.instanceReturned();
     }
 }

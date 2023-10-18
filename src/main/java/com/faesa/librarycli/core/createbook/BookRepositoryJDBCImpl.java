@@ -24,12 +24,14 @@ public class BookRepositoryJDBCImpl implements BookRepository {
     @Override
     public Book save(Book entity) {
         try (var statement = connection.prepareStatement("INSERT INTO C##LABDATABASE.book (title, isbn, publication_date, pages, author_id) VALUES (?, ?, ?, ?, ?)", new String[]{"id"})) {
+            connection.setAutoCommit(false);
             entity.setStatementValues(statement);
             statement.execute();
             var generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 entity.assignId(generatedKeys.getLong(1));
             }
+            connection.commit();
             return entity;
         } catch (Exception e) {
             throw new RuntimeException(e);

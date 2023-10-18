@@ -75,16 +75,16 @@ public class Book implements RelationshipDomainExtractor<Long> {
         return id != null;
     }
 
-    public boolean canBePlacedOnHold(Patron patron) {
-        return copies.stream().anyMatch(copy -> copy.acceptsHold(patron)) && patron.canHold();
+    public boolean canBePlacedOnHold(Patron patron, int daysToExpire) {
+        return copies.stream().anyMatch(copy -> copy.acceptsHold(patron)) && patron.canHold(daysToExpire);
     }
 
-    public Hold placeOnHold(Patron patron, UnaryOperator<Instance> onHold) {
+    public Hold placeOnHold(Patron patron, int daysToExpire, UnaryOperator<Instance> onHold) {
         return copies.stream()
                 .filter(copy -> copy.acceptsHold(patron))
                 .findFirst()
                 .map(copy -> {
-                    Hold hold = copy.placeOnHold(patron);
+                    Hold hold = copy.placeOnHold(patron, daysToExpire);
                     onHold.apply(copy);
                     return hold;
                 })
@@ -116,5 +116,9 @@ public class Book implements RelationshipDomainExtractor<Long> {
 
     public boolean sameAs(Book book) {
         return this.isbn.equals(book.isbn);
+    }
+
+    public boolean hasInstanceBorrowedBy(Patron patron) {
+        return copies.stream().anyMatch(copy -> copy.borrowedBy(patron));
     }
 }

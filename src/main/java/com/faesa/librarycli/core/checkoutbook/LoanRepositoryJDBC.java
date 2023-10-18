@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.*;
 
 @Repository
@@ -134,7 +135,7 @@ public class LoanRepositoryJDBC implements LoanRepository {
         try {
             final var patronId = resultSet.getString("patron_id");
             final var patronName = resultSet.getString("name");
-            final var patronType = resultSet.getString("type");
+            final var patronType = resultSet.getString("patron_type");
             final var patron = new Patron(patronName, PatronType.valueOf(patronType));
             patron.assignId(Long.parseLong(patronId));
 
@@ -157,8 +158,9 @@ public class LoanRepositoryJDBC implements LoanRepository {
             var book = new Book(bookTitle, bookIsbn, bookPublicationDate, bookPages, author);
             book.assignId(bookId);
 
+
             var instanceId = resultSet.getLong("instance_id");
-            var instanceType = InstanceType.supports(resultSet.getString("type"));
+            var instanceType = InstanceType.supports(resultSet.getString("instance_type"));
             var instanceStatus = InstanceStatus.valueOf(resultSet.getString("status"));
             var instance = new Instance(instanceStatus, instanceType, book);
             instance.assignId(instanceId);
@@ -166,8 +168,13 @@ public class LoanRepositoryJDBC implements LoanRepository {
             var hold = new Hold(patron, instance, holdDatePlaced, Integer.parseInt(holdDaysToExpire), new BigDecimal(holdFee));
             hold.assignId(Long.parseLong(holdId));
 
-            var loan = new Loan(hold, resultSet.getInt("time"), resultSet.getDate("loan_date").toInstant(), resultSet.getDate("due_date").toInstant(), resultSet.getBigDecimal("overdue_fee"));
+            final var loanTime = resultSet.getInt("time");
+            final var loanDate = resultSet.getDate("loan_date").toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant();
+            final var loanDueDate = resultSet.getDate("due_date").toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant();
+            final var loanOverdueFee = resultSet.getBigDecimal("overdue_fee");
 
+            var loan = new Loan(hold, loanTime, loanDate, loanDueDate, loanOverdueFee);
+            loan.assignId(resultSet.getLong("loan_id"));
             return loan;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -177,9 +184,14 @@ public class LoanRepositoryJDBC implements LoanRepository {
     private String getFindByQuery(String predicate) {
         return """
                 SELECT
+                    l.id as loan_id,
+                    l.time,
+                    l.loan_date,
+                    l.due_date,
+                    l.overdue_fee,
                 	p.id as patron_id,
                 	p.name,
-                	p.type,
+                	p.type as patron_type,
                 	h.id as hold_id,
                 	h.date_placed,
                 	h.days_to_expire,
@@ -189,7 +201,7 @@ public class LoanRepositoryJDBC implements LoanRepository {
                 	b.pages,
                 	b.publication_date,
                 	b.title,
-                	i.type,
+                	i.type as instance_type,
                 	i.id as instance_id,
                 	i.status,
                 	a.id as author_id,

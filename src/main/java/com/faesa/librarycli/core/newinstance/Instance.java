@@ -66,9 +66,9 @@ public class Instance implements DomainValuesExtractor<Long> {
         return status == InstanceStatus.AVAILABLE && type.acceptsHold(patron);
     }
 
-    public Hold placeOnHold(Patron patron) {
-        Assert.state(acceptsHold(patron), "Instance does not accept hold");
-        Assert.state(patron.canHold(), "Patron can't hold anymore because he has more than two holds overdue");
+    public Hold placeOnHold(Patron patron, int daysToExpire) {
+        Assert.isTrue(acceptsHold(patron), "Instance does not accept hold");
+        Assert.isTrue(patron.canHold(daysToExpire), "Patron can't hold anymore because he has more than two holds overdue");
         this.status = InstanceStatus.HOLD;
         return new Hold(patron, this);
     }
@@ -100,5 +100,22 @@ public class Instance implements DomainValuesExtractor<Long> {
 
     public boolean isHeld() {
         return status == InstanceStatus.HOLD;
+    }
+
+    public boolean borrowedBy(Patron patron) {
+        return status == InstanceStatus.CHECKED_OUT && patron.hasBorrowed(this);
+    }
+
+    public boolean isSameOf(Instance instance) {
+        return this.id.equals(instance.id);
+    }
+
+    public void instanceReturned() {
+        Assert.state(this.isBorrowed(), "Instance is not borrowed");
+        this.status = InstanceStatus.AVAILABLE;
+    }
+
+    private boolean isBorrowed() {
+        return status == InstanceStatus.CHECKED_OUT;
     }
 }

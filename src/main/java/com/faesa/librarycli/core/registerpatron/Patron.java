@@ -74,20 +74,31 @@ public class Patron implements DomainValuesExtractor<Long> {
         return type.currentHoldFee();
     }
 
-    public boolean canHold() {
+    public boolean canHold(int daysToExpire) {
         // patrons with more than two overdue books cannot place holds
-        return holds.stream().filter(Hold::isExpired).count() < 2;
+        return holds.stream().filter(Hold::isExpired).count() < 2 && !type.maximumHoldsExceeded(holds.size()) && type.availableHoldDuration() >= daysToExpire;
     }
 
     public boolean canCheckout() {
+        // a patron cannot check out the same book twice
+        boolean alreadyHasLoanWithSameHold = this.alreadyHasLoanWithSameHold();
+        if (alreadyHasLoanWithSameHold) return false;
+
+
         // patrons with overdue checkouts cannot check out new books,
         // also patrons cannot borrow more than a certain number of books at a time
         // the above rule does not apply to researchers
         int unreturnedLoans = (int) loans.stream()
-                .filter(loan -> !loan.wasReturned())
+                .filter(Loan::wasReturned)
                 .count();
 
         return loans.stream().noneMatch(Loan::isOverdue) && !type.maximumLoansExceeded(unreturnedLoans);
+    }
+
+    private boolean alreadyHasLoanWithSameHold() {
+        return loans.stream()
+                .filter(loan -> !loan.wasReturned())
+                .anyMatch(loan -> loan.anyHeldMatches(holds));
     }
 
     public Loan checkout(Hold hold, int checkoutTime) {
@@ -114,8 +125,7 @@ public class Patron implements DomainValuesExtractor<Long> {
     }
 
     public Loan createCheckout(@NotNull @Positive Long holdId, int checkoutTime) {
-        Assert.isTrue(canCheckout(), "Patron cannot checkout");
-        Assert.isTrue(canHold(), "Patron cannot place holds");
+        Assert.isTrue(canCheckout(), "Patron cannot checkout book, You are probably trying to check out the same book twice");
         return holds.stream()
                 .filter(hold -> hold.getId().equals(holdId))
                 .findFirst()
@@ -148,5 +158,24 @@ public class Patron implements DomainValuesExtractor<Long> {
                 .findFirst()
                 .map(Hold::getInstance)
                 .orElseThrow(() -> new RuntimeException("Hold not found"));
+    }
+
+    public boolean hasBorrowed(Instance instance) {
+        return loans.stream().anyMatch(loan -> loan.borrowedInstanceMatches(instance));
+    }
+
+    public void returnBook(Book book) {
+        loans.stream()
+                .filter(loan -> loan.isBorrowedInstanceOf(book))
+                .findFirst()
+                .ifPresent(loan -> {
+                    loan.returnBook();
+                    holds.removeIf(loan::heldMatches);
+                    loans.remove(loan);
+                });
+    }
+
+    public BigDecimal feeForOverdueLoan() {
+        return this.type.feeForOverdueLoan();
     }
 }

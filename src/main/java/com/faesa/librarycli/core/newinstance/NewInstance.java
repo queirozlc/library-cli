@@ -29,18 +29,11 @@ public class NewInstance {
                     help = "The instance's type, it must be either FREE or RESTRICTED",
                     valueProvider = InstanceTypeValueProvider.class,
                     value = {"-t", "--type"}
-            ) @NotBlank String type,
-            @ShellOption(
-                    help = "The instance's status, it must be either AVAILABLE or UNAVAILABLE",
-                    valueProvider = InstanceStatusValueProvider.class,
-                    value = {"-s", "--status"},
-                    defaultValue = "AVAILABLE"
-            ) @NotBlank String status
+            ) @NotBlank String type
     ) {
-        var instanceStatus = InstanceStatus.valueOf(status.toUpperCase());
         var instanceType = InstanceType.valueOf(type.toUpperCase());
         return bookRepository.findByIsbn(bookIsbn).map(book -> {
-            var instance = new Instance(instanceStatus, instanceType, book);
+            var instance = new Instance(InstanceStatus.AVAILABLE, instanceType, book);
             instanceRepository.save(instance);
             return "Instance created!";
         }).orElse("Book not found!");
@@ -52,17 +45,6 @@ class InstanceTypeValueProvider implements ValueProvider {
     @Override
     public List<CompletionProposal> complete(CompletionContext completionContext) {
         return Stream.of(InstanceType.values())
-                .map(Enum::name)
-                .map(CompletionProposal::new)
-                .toList();
-    }
-}
-
-@Component
-class InstanceStatusValueProvider implements ValueProvider {
-    @Override
-    public List<CompletionProposal> complete(CompletionContext completionContext) {
-        return Stream.of(InstanceStatus.values())
                 .map(Enum::name)
                 .map(CompletionProposal::new)
                 .toList();
