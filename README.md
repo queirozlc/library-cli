@@ -32,6 +32,8 @@ The scripts for create all the relations of the database is available on the fol
 - Setup all tables again with respective constraints and relationships
 - And it does a _warm up insert_ on database, which means the script insert some values for some tables.
 
+At the `docs` folder also on project root there's a _ERD.png_ which indicates the Entity Relational Diagram model that represents all the entities relationship's
+
 ## Environment Variables
 
 To run this project, you will need to create a `env.properties` file on src/main/resources, and add the following key/values to the file:
