@@ -22,6 +22,15 @@ Any patron with more than two overdue checkouts at a library will get a rejectio
 
 How actually a patron knows which books are there to lend? Library has its catalogue of books where books are added together with their specific instances. Each instance must to be associated with the ISBN of the original copy, besides, it is totally possible to have two different instances of the same book.
 
+## Project Structure
+
+The scripts for create all the relations of the database is available on the folder `scripts` on project root, basically what the script does is:
+
+- Creates an user on oracle database
+- Manage the session of the user created
+- Drop all the constraints and Tables
+- Setup all tables again with respective constraints and relationships
+- And it does a _warm up insert_ on database, which means the script insert some values for some tables.
 
 ## Environment Variables
 
@@ -56,3 +65,24 @@ Go to the project directory `src/main/resources` and set up your environment var
 ```
 
 Ensure that you have a JDK installed, the project runs the JAVA 17. Besides, the oracle database must be ready to go.
+
+## Installation
+
+Install `library-cli` with maven
+
+> ⚠️ You may need to download the maven to build using the Maven CLI. If so, you can see the following tutorial: https://www.baeldung.com/install-maven-on-windows-linux-mac
+
+```bash
+mvn clean install -DskipTests
+```
+The final JAR file going to be available on `target` folder.
+
+```bash
+cd target
+```
+
+You can run the JAR file by using the following command below:
+
+```bash
+java -jar librarycli-0.0.1-SNAPSHOT.jar
+```
