@@ -3,6 +3,9 @@
 
 The main purpose of this project is to build an application who is simulate an automation of some common library processes, which includes register an author, register a book, allow readers to borrow instance of available books and other things that going to be explained better on other sections.
 
+## Presentation Video
+
+The video of the demo is available on youtube on <a href="https://youtu.be/thkyf1S4Q1Y" target="__blank">this link</a>
 
 ## Documentation
 

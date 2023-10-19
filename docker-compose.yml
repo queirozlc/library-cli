@@ -1,13 +1,36 @@
+# Use root/example as user/password credentials
+version: "3.1"
+
 services:
-  oracle-db:
-    image: oracle/database:19.3.0-ee
-    container_name: oracle-container
+  #  oracle-db:
+  #    image: oracle/database:19.3.0-ee
+  #    container_name: oracle-container
+  #    ports:
+  #      - "1521:1521"
+  #      - "5500:5500"
+  #    environment:
+  #      - ORACLE_PWD=password
+  #      - ORACLE_CHARACTERSET=AL32UTF8
+  #      - ORACLE_SID=XE
+  #    volumes:
+  #      - ./scripts:/docker-entrypoint-initdb.d/setup
+  mongo:
+    image: mongo
+    restart: always
     ports:
-      - "1521:1521"
-      - "5500:5500"
+      - "27017:27017"
     environment:
-      - ORACLE_PWD=password
-      - ORACLE_CHARACTERSET=AL32UTF8
-      - ORACLE_SID=XE
-    volumes:
-      - ./scripts:/docker-entrypoint-initdb.d/setup
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "3001:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
