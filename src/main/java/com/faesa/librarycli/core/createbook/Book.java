@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -27,6 +28,7 @@ public class Book implements RelationshipDomainExtractor<Long> {
     @Getter
     private String isbn;
     private LocalDate publicationDate;
+    @Getter
     private Integer pages;
 
 
@@ -120,5 +122,9 @@ public class Book implements RelationshipDomainExtractor<Long> {
 
     public boolean hasInstanceBorrowedBy(Patron patron) {
         return copies.stream().anyMatch(copy -> copy.borrowedBy(patron));
+    }
+
+    public String formatPublicationDate(DateTimeFormatter formatter) {
+        return publicationDate.format(formatter);
     }
 }

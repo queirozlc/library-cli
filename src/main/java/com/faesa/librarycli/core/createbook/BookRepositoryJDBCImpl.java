@@ -178,7 +178,7 @@ public class BookRepositoryJDBCImpl implements BookRepository {
     }
 
     private String getFindAllQuery() {
-        return "SELECT b.* " +
+        return "SELECT b.*, a.name, a.nationality, a.id as author_id " +
                 "FROM C##LABDATABASE.book b " +
                 "INNER JOIN C##LABDATABASE.author a ON b.author_id = a.id " +
                 "ORDER BY b.title";
