@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -133,5 +134,17 @@ public class Hold implements DomainValuesExtractor<Long> {
 
     public void instanceReturned() {
         this.instance.instanceReturned();
+    }
+
+    public String datePlacedFormatted(DateTimeFormatter dateTimeFormatter) {
+        return this.datePlaced.format(dateTimeFormatter);
+    }
+
+    public String patronName() {
+        return this.patron.getName();
+    }
+
+    public String patronType() {
+        return this.patron.getType();
     }
 }
