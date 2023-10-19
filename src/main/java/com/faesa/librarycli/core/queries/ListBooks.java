@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @ShellComponent
-@ShellCommandGroup("Queries Commands")
+@ShellCommandGroup("Query Commands")
 @RequiredArgsConstructor
 public class ListBooks {
 

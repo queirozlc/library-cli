@@ -20,6 +20,7 @@ import java.util.Set;
 public class Patron implements DomainValuesExtractor<Long> {
     private final Set<Hold> holds = new LinkedHashSet<>();
     private final Set<Loan> loans = new LinkedHashSet<>();
+    @Getter
     private String name;
     private PatronType type;
     @Getter
@@ -177,5 +178,9 @@ public class Patron implements DomainValuesExtractor<Long> {
 
     public BigDecimal feeForOverdueLoan() {
         return this.type.feeForOverdueLoan();
+    }
+
+    public String getType() {
+        return type.name();
     }
 }

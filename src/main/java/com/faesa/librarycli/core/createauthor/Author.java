@@ -14,6 +14,7 @@ public class Author implements DomainValuesExtractor<Long> {
     private Long id;
     @Getter
     private String name;
+    @Getter
     private String nationality;
 
     @Deprecated(forRemoval = true)

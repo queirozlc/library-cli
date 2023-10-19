@@ -91,7 +91,12 @@ public class PatronRepositoryJDBC implements PatronRepository {
             var resultSet = statement.executeQuery();
             var patrons = new ArrayList<Patron>(Collections.emptyList());
             while (resultSet.next()) {
-                patrons.add(buildPatron(resultSet));
+                var patron = new Patron(
+                        resultSet.getString("name"),
+                        PatronType.valueOf(resultSet.getString("type"))
+                );
+                patron.assignId(resultSet.getLong("id"));
+                patrons.add(patron);
             }
             return patrons;
         } catch (Exception e) {
